@@ -1,7 +1,7 @@
 [![GoDoc](https://pkg.go.dev/github.com/biribiribiri/sparky?status.svg)](http://pkg.go.dev/github.com/biribiribiri/sparky)
 
 # sparky
-Golang library for controlling Dogtra 2300NCP shock collar using the HackRF SDR.
+Golang library for controlling the Dogtra 2300NCP shock collar using the HackRF SDR.
 
 DISCLAIMER: This project is not affiliated with or endorsed by Dogtra.
 

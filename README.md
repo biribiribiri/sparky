@@ -62,8 +62,8 @@ Symbol definitions:
   * `1`: 1.76 kHz, 0.75 milliseconds
 
 It is important for there to be no phase discontinuities in the modulating
-signal (Continuous Phase Frequency Shift Keying, CPFSK). The initial phase
-(-90 degrees) also appears to be important.
+signal (Continuous Phase Frequency Shift Keying, CPFSK). See (implementation
+for more detail)[pkg/dt2300ncp/dt2300ncp.go].
 
 Command format:
 

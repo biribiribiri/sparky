@@ -12,7 +12,6 @@ import (
 )
 
 var cmdFlag = flag.String("cmd", "", "command, one of {nick, continuous, vibrate, pairing}")
-var repeatFlag = flag.Bool("repeat", false, "if true, repeat the command until terminated")
 var intensityFlag = flag.Int("intensity", 1, "intensity, between 0 and 127 inclusive")
 var durationFlag = flag.Duration("duration", time.Duration(0), "duration of the command")
 
@@ -34,8 +33,8 @@ func parseCmd() dt.Cmd {
 
 func main() {
 	flag.Parse()
-	hrf := hackrf.NewHackRFTX(hackrf.MinSampleRate, dt.Freq)
-	hrf.SetIQData(dt.GenerateIQ(hackrf.MinSampleRate, parseCmd(), dt.CollarID1, *intensityFlag, *durationFlag))
-	hrf.SetRepeat(*repeatFlag)
-	hrf.Start()
+	r := dt.NewIQReader(hackrf.MinSampleRate, parseCmd(), dt.CollarID1, *intensityFlag, *durationFlag)
+	if err := hackrf.Transmit(hackrf.MinSampleRate, dt.Freq, r); err != nil {
+		log.Fatalln(err)
+	}
 }

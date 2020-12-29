@@ -1,6 +1,7 @@
 package dogtra2300ncp
 
 import (
+	"io"
 	"log"
 	"math"
 	"math/cmplx"
@@ -163,36 +164,48 @@ var intensities map[int]string = map[int]string{
 }
 
 const symbolTime = 750 * time.Microsecond
-const f1 = 6290 // Hz, freq for zero
-const f2 = 1760 // Hz, freq for one
+const freqZero = 6290 // Hz, freq for zero
+const freqOne = 1760  // Hz, freq for one
 
-func freqForSymbol(symbol rune) float64 {
+func freqForSymbol(symbol byte) float64 {
 	switch symbol {
 	case '0':
-		return f1
+		return freqZero
 	case '1':
-		return f2
+		return freqOne
 	default:
 		log.Fatalf("invalid symbol: %v", symbol)
 		return 0
 	}
 }
 
-func binaryToIQ(cmd string, sampleRate int) []byte {
-	samplesPerSymbol := int(math.Round(symbolTime.Seconds() * float64(sampleRate)))
+type reader struct {
+	symbols    string
+	sampleRate int
+	cur        int
+	angle      float64
+}
 
-	var out []byte
-	var angle float64
-	angle = -0.5 * math.Pi
-	for _, b := range cmd {
-		for j := 0; j < int(samplesPerSymbol); j++ {
-			iq := 80 * cmplx.Exp(-1.0*1i*complex(angle, 0))
-			out = append(out, byte(int8(math.Round(real(iq)))))
-			out = append(out, byte(int8(math.Round(imag(iq)))))
-			angle += 2.0 * math.Pi * freqForSymbol(b) * (1.0 / float64(sampleRate))
+func (r *reader) Read(p []byte) (int, error) {
+	count := 0 // The number of bytes this call to Read is returning.
+
+	samplesPerSymbol := int(math.Round(symbolTime.Seconds() * float64(r.sampleRate)))
+	for i := 0; i < len(p)/2; i++ {
+		symbolIdx := r.cur / samplesPerSymbol
+		if symbolIdx >= len(r.symbols) {
+			return count, io.EOF
 		}
+		iq := 80 * cmplx.Exp(1i*complex(r.angle, 0))
+		p[2*i] = byte(int8(math.Round(real(iq))))
+		p[2*i+1] = byte(int8(math.Round(imag(iq))))
+		// Decrementing the angle here rather than incrementing it is
+		// important. I don't really understand why though.
+		r.angle -= 2.0 * math.Pi * freqForSymbol(r.symbols[symbolIdx]) * (1.0 / float64(r.sampleRate))
+		r.angle = math.Mod(r.angle, 2.0*math.Pi)
+		r.cur++
+		count += 2
 	}
-	return out
+	return count, nil
 }
 
 func durationToRepeat(duration time.Duration) int {
@@ -204,9 +217,9 @@ func durationToRepeat(duration time.Duration) int {
 	return repeat
 }
 
-// GenerateIQ returns signed 8-bit IQ data for a Dogtra 2300NCP collar
-// command. intensity must be between 0 and 127.
-func GenerateIQ(sampleRate int, cmd Cmd, id CollarID, intensity int, duration time.Duration) []byte {
+// NewIQReader returns a io.Reader that provides signed 8-bit IQ data for a
+// Dogtra 2300NCP collar command. intensity must be between 0 and 127.
+func NewIQReader(sampleRate int, cmd Cmd, id CollarID, intensity int, duration time.Duration) io.Reader {
 	intensityBin, ok := intensities[intensity]
 	if !ok {
 		log.Fatalf("invalid intensity %d, expected value between 0 and 127", intensity)
@@ -219,5 +232,5 @@ func GenerateIQ(sampleRate int, cmd Cmd, id CollarID, intensity int, duration ti
 		builder.WriteString(string(id))
 		builder.WriteString(intensityBin)
 	}
-	return binaryToIQ(builder.String(), sampleRate)
+	return &reader{symbols: builder.String(), sampleRate: sampleRate}
 }

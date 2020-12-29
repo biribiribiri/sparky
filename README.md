@@ -6,6 +6,10 @@ HackRF SDR.
 
 DISCLAIMER: This project is not affiliated with or endorsed by Dogtra.
 
+## Dependencies
+
+* `hackrf_transfer`
+
 ## Pairing
 
 To pair your collar to the software remote:

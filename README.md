@@ -1,4 +1,4 @@
-[![GoDoc](https://pkg.go.dev/github.com/biribiribiri/sparky?status.svg)](http://pkg.go.dev/github.com/biribiribiri/sparky)
+[![Go Reference](https://pkg.go.dev/badge/biribiribiri/sparky.svg)](https://pkg.go.dev/biribiribiri/sparky)
 
 # sparky
 Golang library for controlling the Dogtra 2300NCP shock collar using the

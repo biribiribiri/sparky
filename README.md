@@ -28,14 +28,19 @@ To pair your collar to the software remote:
 
 ## CLI Examples
 ```
+# Install dt2300ncp.
+go install github.com/biribiribiri/sparky/cmd/dt2300ncp
+
+# We're assuming your GOPATH is ~/go here.
+
 # Maximum intensity nick.
-./dt2300ncp --cmd=nick --intensity=127
+~/go/bin/dt2300ncp --cmd=nick --intensity=127
 
 # Continuous stimulation for 1 second.
-./dt2300ncp --cmd=continuous --intensity=30 --duration=1s
+~/go/bin/dt2300ncp --cmd=continuous --intensity=30 --duration=1s
 
 # Vibrate for 5 seconds.
-./dt2300ncp --cmd=vibrate --duration=5s
+~/go/bin/dt2300ncp --cmd=vibrate --duration=5s
 ```
 
 ## Reverse Engineering Details
@@ -57,7 +62,8 @@ Symbol definitions:
   * `1`: 1.76 kHz, 0.75 milliseconds
 
 It is important for there to be no phase discontinuities in the modulating
-signal. The initial phase (-90 degrees) also appears to be important.
+signal (Continuous Phase Frequency Shift Keying, CPFSK). The initial phase
+(-90 degrees) also appears to be important.
 
 Command format:
 

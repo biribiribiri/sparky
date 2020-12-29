@@ -6,7 +6,7 @@ HackRF SDR.
 
 DISCLAIMER: This project is not affiliated with or endorsed by Dogtra.
 
-# Pairing
+## Pairing
 
 To pair your collar to the software remote:
 1. Turn off the collar.
@@ -26,7 +26,7 @@ To pair your collar to the software remote:
 	./dt2300ncp --cmd=vibrate --duration=5s
 	```
 
-# CLI Examples
+## CLI Examples
 ```
 # Maximum intensity nick.
 ./dt2300ncp --cmd=nick --intensity=127
@@ -38,14 +38,14 @@ To pair your collar to the software remote:
 ./dt2300ncp --cmd=vibrate --duration=5s
 ```
 
-# Reverse Engineering Details
+## Reverse Engineering Details
 
 The Dogtra 2300NCP is a shock collar with momentary stimulation, continuous
 stimulation, and vibration/pager functionality. It has a rheostat dial to
 control the stimulation intensity, which is displayed on the LCD screen as a
 value between 0 and 127.
 
-## Communication Protocol
+### Communication Protocol
 
 The remote uses binary FSK (frequency-shift keying) to send commands to the
 collar.
@@ -71,12 +71,12 @@ continuous and vibrate commands, the `[Command][CollarID][Intensity]` sequence
 repeats until the button is released or until the 12s timeout is reached.
 
 
-### Prefix 
+#### Prefix 
 
 Prefix (28 bits): `1111111000000011111110000000`
 
 
-### Commands 
+#### Commands 
 
 | Command    | Sequence (36 bits)                     |
 |:-----------|:---------------------------------------|
@@ -85,7 +85,7 @@ Prefix (28 bits): `1111111000000011111110000000`
 | Vibrate    | `111100001001001101101101001001101001` |
 | Pairing    | `111100001101101101101001001001001001` |
 
-### Collar ID
+#### Collar ID
 
 The 2300NCP remote has a "1-dog"/"2-dog" switch that allows it to control two
 collars. This changes the collar ID that is broadcast by the remote. A collar
@@ -95,7 +95,7 @@ instructions described above. Example collar IDs (36 bits):
  * `101001001001001101001001101001101001`
  * `101001001001001101001001101001101101`
 
-### Intensity
+#### Intensity
 
 The intensity value affects the stimulation strength for the nick and
 continous commands. The intensity value as set by the rheostat dial is also

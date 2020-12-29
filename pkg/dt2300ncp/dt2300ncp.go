@@ -163,34 +163,33 @@ var intensities map[int]string = map[int]string{
 }
 
 const symbolTime = 750 * time.Microsecond
+const f1 = 6290 // Hz, freq for zero
+const f2 = 1760 // Hz, freq for one
+
+func freqForSymbol(symbol rune) float64 {
+	switch symbol {
+	case '0':
+		return f1
+	case '1':
+		return f2
+	default:
+		log.Fatalf("invalid symbol: %v", symbol)
+		return 0
+	}
+}
 
 func binaryToIQ(cmd string, sampleRate int) []byte {
-	const f1 = 6290 // Hz, freq for zero
-	const f2 = 1760 // Hz, freq for one
-
 	samplesPerSymbol := int(math.Round(symbolTime.Seconds() * float64(sampleRate)))
 
 	var out []byte
 	var angle float64
 	angle = -0.5 * math.Pi
 	for _, b := range cmd {
-		switch b {
-		case '1':
-			for j := 0; j < int(samplesPerSymbol); j++ {
-				iq := 80 * cmplx.Exp(-1.0*1i*complex(angle, 0))
-				out = append(out, byte(int8(math.Round(real(iq)))))
-				out = append(out, byte(int8(math.Round(imag(iq)))))
-				angle += 2.0 * math.Pi * f2 * (1.0 / float64(sampleRate))
-			}
-		case '0':
-			for j := 0; j < int(samplesPerSymbol); j++ {
-				iq := 80 * cmplx.Exp(-1.0*1i*complex(angle, 0))
-				out = append(out, byte(int8(math.Round(real(iq)))))
-				out = append(out, byte(int8(math.Round(imag(iq)))))
-				angle += 2.0 * math.Pi * f1 * (1.0 / float64(sampleRate))
-			}
-		default:
-			log.Fatalf("invalid char in cmd: %v", b)
+		for j := 0; j < int(samplesPerSymbol); j++ {
+			iq := 80 * cmplx.Exp(-1.0*1i*complex(angle, 0))
+			out = append(out, byte(int8(math.Round(real(iq)))))
+			out = append(out, byte(int8(math.Round(imag(iq)))))
+			angle += 2.0 * math.Pi * freqForSymbol(b) * (1.0 / float64(sampleRate))
 		}
 	}
 	return out

@@ -63,7 +63,7 @@ Symbol definitions:
 
 It is important for there to be no phase discontinuities in the modulating
 signal (Continuous Phase Frequency Shift Keying, CPFSK). See [implementation
-for more detail](../blob/master/pkg/dt2300ncp/dt2300ncp.go).
+for more detail](../main/pkg/dt2300ncp/dt2300ncp.go).
 
 Command format:
 

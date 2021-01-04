@@ -27,6 +27,21 @@ const ContinuousCmd Cmd = "111100001001001101101101101001001001"
 const VibrateCmd Cmd = "111100001001001101101101001001101001"
 const PairingCmd Cmd = "111100001101101101101001001001001001"
 
+func (c Cmd) String() string {
+	switch c {
+	case NickCmd:
+		return "NickCmd"
+	case ContinuousCmd:
+		return "ContinuousCmd"
+	case VibrateCmd:
+		return "VibrateCmd"
+	case PairingCmd:
+		return "PairingCmd"
+	default:
+		return ""
+	}
+}
+
 type CollarID string
 
 const CollarID1 CollarID = "101001001001001101001001101001101001"
